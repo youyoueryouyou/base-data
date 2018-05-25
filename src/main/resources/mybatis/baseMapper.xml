@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.you.base.BaseMapper">
+
+    <sql id="Base_Column_List">
+        <trim suffixOverrides=",">
+            <foreach collection="columns" item="column" >
+                `${column.columnName}`,
+            </foreach>
+        </trim>
+    </sql>
+
+    <sql id="Where_Condition">
+        <if test="criteria.valid">
+            ${criteria.typeHandler}
+            <trim prefix="(" suffix=")" prefixOverrides="and|or">
+                <foreach collection="criteria.criteria" item="criterion">
+                    <choose>
+                        <when test="criterion.noValue">${criterion.typeHandler} ${criterion.condition}</when>
+                        <when test="criterion.singleValue">${criterion.typeHandler} ${criterion.condition} #{criterion.value}</when>
+                        <when test="criterion.betweenValue">${criterion.typeHandler} ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+                        <when test="criterion.listValue">${criterion.typeHandler} ${criterion.condition}
+                            <foreach collection="criterion.value" item="listItem" open="(" close=")" separator=",">#{listItem}</foreach>
+                        </when>
+                    </choose>
+                </foreach>
+            </trim>
+        </if>
+    </sql>
+
+    <sql id="Where_Select_Condition">
+        <where>
+            <trim prefixOverrides="and|or">
+                <foreach collection="oredCriteria" item="criteria">
+                    <include refid="Where_Condition" />
+                </foreach>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="Where_Update_Condition">
+        <where>
+            <trim prefixOverrides="and|or">
+            <foreach collection="condition.oredCriteria" item="criteria">
+                <include refid="Where_Condition" />
+            </foreach>
+            </trim>
+        </where>
+    </sql>
+
+    <sql id="Where_PrimaryKey" >
+        <where>
+            <trim prefixOverrides="and">
+                <foreach collection="columns" item="column" >
+                    <if test="column.primaryKey">
+                        and `${column.columnName}` = #{${column.fieldName}}
+                    </if>
+                </foreach>
+            </trim>
+        </where>
+    </sql>
+
+    <insert id="insert" parameterType="com.you.base.BaseModel">
+        insert  into ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <foreach collection="columns" item="column" >
+                <choose>
+                  <when test="column.primaryKey and column.columnValue != null">
+                      `${column.columnName}`,
+                  </when>
+                  <when test="!column.primaryKey">
+                      `${column.columnName}`,
+                  </when>
+                </choose>
+            </foreach>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" >
+                <choose>
+                    <when test="column.primaryKey and column.columnValue != null">
+                        #{${column.fieldName}},
+                    </when>
+                    <when test="!column.primaryKey">
+                        #{${column.fieldName}},
+                    </when>
+                </choose>
+            </foreach>
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.you.base.BaseModel">
+        insert  into ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <foreach collection="columns" item="column" >
+                <if test="column.columnValue != null">
+                    `${column.columnName}`,
+                </if>
+            </foreach>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="columns" item="column" >
+                <if test="column.columnValue != null">
+                    #{${column.fieldName}},
+                </if>
+            </foreach>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.you.base.BaseModel">
+        update ${tableName}
+        <set>
+            <foreach collection="columns" item="column" >
+                <if test="!column.primaryKey">
+                    `${column.columnName}` = #{${column.fieldName}},
+                </if>
+            </foreach>
+        </set>
+        <include refid="Where_PrimaryKey" />
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.you.base.BaseModel">
+        update ${tableName}
+        <set>
+            <foreach collection="columns" item="column" >
+                <if test="!column.primaryKey and column.columnValue != null">
+                    `${column.columnName}` = #{${column.fieldName}},
+                </if>
+            </foreach>
+        </set>
+        <include refid="Where_PrimaryKey" />
+    </update>
+
+    <update id="updateByCondition" parameterType="map">
+        update ${record.tableName}
+        <set>
+            <foreach collection="record.columns" item="column" >
+                <if test="!column.primaryKey">
+                    `${column.columnName}` = #{${column.fieldName}},
+                </if>
+            </foreach>
+        </set>
+        <if test="_parameter != null" >
+            <include refid="Where_Update_Condition" />
+        </if>
+    </update>
+
+    <update id="updateByConditionSelective" parameterType="map">
+        update ${record.tableName}
+        <set>
+            <foreach collection="record.columns" item="column" >
+                <if test="!column.primaryKey and column.columnValue != null">
+                    `${column.columnName}` = #{${column.fieldName}},
+                </if>
+            </foreach>
+        </set>
+        <if test="_parameter != null" >
+            <include refid="Where_Update_Condition" />
+        </if>
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="com.you.base.BaseModel">
+        delete from ${tableName}
+        <include refid="Where_PrimaryKey" />
+    </delete>
+
+    <delete id="deleteByCondition" parameterType="com.you.base.BaseCondition">
+        delete from ${tableName}
+        <if test="_parameter != null" >
+            <include refid="Where_Select_Condition" />
+        </if>
+    </delete>
+
+    <select id="selectByPrimaryKey" parameterType="com.you.base.BaseModel" resultType="com.you.base.BasePojo">
+        select
+        <include refid="Base_Column_List" />
+        from ${tableName}
+        <include refid="Where_PrimaryKey" />
+    </select>
+
+    <select id="selectByCondition" parameterType="com.you.base.BaseCondition" resultType="com.you.base.BasePojo">
+        select
+        <if test="distinct" >
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from ${tableName}
+        <if test="_parameter != null" >
+            <include refid="Where_Select_Condition" />
+        </if>
+        <if test="orderByClause != null" >
+            order by ${orderByClause}
+        </if>
+        <if test="offset != null and offset>=0 and rows !=null and rows >0" >
+            limit #{offset} , #{rows}
+        </if>
+    </select>
+
+    <select id="countByCondition" parameterType="com.you.base.BaseCondition" resultType="int">
+        select
+        count(*)
+        from ${tableName}
+        <if test="_parameter != null" >
+            <include refid="Where_Select_Condition" />
+        </if>
+    </select>
+
+    <select id="selectBySql" parameterType="string" resultType="map">
+        ${sql}
+    </select>
+</mapper>
