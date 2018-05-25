@@ -31,19 +31,20 @@ public class BasePojo extends TreeMap<String, Object> implements Serializable {
     private void initValue(Field[] fields,Object object){
         for (Field field : fields){
             Column column = field.getAnnotation(Column.class);
+            String name = field.getName();
             if (column != null){
-                String name = column.value();
-                if (name == null || "".equals(name)){
-                    name = field.getName();
+                String columnKey = column.value();
+                if (columnKey != null && !"".equals(columnKey)){
+                    name = columnKey;
                 }
-                if (containsKey(name)){
-                    Object value = get(name);
-                    try {
-                        field.setAccessible(true);
-                        field.set(object,value);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
+            }
+            if (containsKey(name)){
+                Object value = get(name);
+                try {
+                    field.setAccessible(true);
+                    field.set(object,value);
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
         }
