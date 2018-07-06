@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * Created by shicz on 2018/5/25.
+ * @author shicz
  */
 public class BasePojo extends TreeMap<String, Object> implements Serializable {
     /**

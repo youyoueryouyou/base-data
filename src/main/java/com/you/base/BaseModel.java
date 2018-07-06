@@ -8,7 +8,7 @@ import java.util.List;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * Created by shicz on 2018/5/16.
+ * @author shicz
  */
 public class BaseModel implements Serializable
 {

@@ -5,7 +5,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.List;
 
 /**
- * Created by shicz on 2018/5/16.
+ * @author shicz
  */
 public class Page<T>
 {
@@ -21,18 +21,24 @@ public class Page<T>
             this.pageSize = pageSize;
         }
     }
-    
-    private int pageNo = 1; // 当前页
-    
-    private int rowCount = 0; // 总行数
-    
-    private int pageSize = 20; // 页大小
-    
-    private int pageCount = 0; // 总页数
-    
-    private int pageOffset = 0;// 当前页起始记录
-    
-    private int pageTail = 0;// 当前页到达的记录
+
+    /**当前页*/
+    private int pageNo = 1;
+
+    /**总行数*/
+    private int rowCount = 0;
+
+    /**页大小*/
+    private int pageSize = 20;
+
+    /**总页数*/
+    private int pageCount = 0;
+
+    /**当前页起始记录*/
+    private int pageOffset = 0;
+
+    /**当前页到达的记录*/
+    private int pageTail = 0;
 
     private List<T> result;
 

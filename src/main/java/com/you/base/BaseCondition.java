@@ -5,9 +5,14 @@ import java.util.List;
 
 
 /**
- * Created by shicz on 2018/5/21.
+ * @author shicz
  */
 public class BaseCondition {
+    private final String LEFT_BRACKET = "(";
+    private final String RIGHT_BRACKET = ")";
+    private final String EMPTY_SIGN = " ";
+
+
     private Boolean distinct;
     private String tableName;
     
@@ -96,9 +101,9 @@ public class BaseCondition {
         {
             this.tableName = tableName;
         }
-        else if (!tableName.trim().startsWith("(") && tableName.split(" ").length != 1)
+        else if (!tableName.trim().startsWith(LEFT_BRACKET) && tableName.split(EMPTY_SIGN).length != 1)
         {
-            this.tableName = "(" + tableName + ") as " + this.tableName;
+            this.tableName = LEFT_BRACKET + tableName + ") as " + this.tableName;
         }
         else
         {
@@ -207,7 +212,7 @@ public class BaseCondition {
         offset = null;
     }
 
-    public static class Criteria extends GeneratedCriteria
+    public static class Criteria extends AbstractGeneratedCriteria
     {
         
         protected Criteria(String typeHandler)
@@ -311,12 +316,14 @@ public class BaseCondition {
 
     }
     
-    public static abstract class GeneratedCriteria
+    public static abstract class AbstractGeneratedCriteria
     {
+        private final String REVERSE_QUOTATION = "`";
+        private final String PERCENT_SIGN  = "%";
         protected List<Criterion> criteria;
         private String typeHandler;
         
-        protected GeneratedCriteria(String typeHandler)
+        protected AbstractGeneratedCriteria(String typeHandler)
         {
             super();
             this.typeHandler = typeHandler;
@@ -417,8 +424,8 @@ public class BaseCondition {
         
         public Criteria andValueIsNull(String key)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " is null");
@@ -427,8 +434,8 @@ public class BaseCondition {
         
         public Criteria andValueIsNotNull(String key)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " is not null");
@@ -437,8 +444,8 @@ public class BaseCondition {
         
         public Criteria andValueEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " =", value, key);
@@ -447,8 +454,8 @@ public class BaseCondition {
         
         public Criteria andValueNotEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " <>", value, key);
@@ -457,12 +464,12 @@ public class BaseCondition {
 
         public Criteria andValueLike(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
-            if (value != null && !value.toString().startsWith("%") &&  !value.toString().startsWith("%")){
-                value = "%" + value + "%" ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
+                value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
             addAndCriterion(key + " like", value, key);
             return (Criteria)this;
@@ -470,12 +477,12 @@ public class BaseCondition {
 
         public Criteria andValueNotLike(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
-            if (value != null && !value.toString().startsWith("%") &&  !value.toString().startsWith("%")){
-                value = "%" + value + "%" ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
+                value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
             addAndCriterion(key + " not like", value, key);
             return (Criteria)this;
@@ -483,8 +490,8 @@ public class BaseCondition {
         
         public Criteria andValueGreaterThan(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " >", value, key);
@@ -493,8 +500,8 @@ public class BaseCondition {
         
         public Criteria andValueGreaterThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " >=", value, key);
@@ -503,8 +510,8 @@ public class BaseCondition {
         
         public Criteria andValueLessThan(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " <", value, key);
@@ -513,8 +520,8 @@ public class BaseCondition {
         
         public Criteria andValueLessThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " <=", value, key);
@@ -523,8 +530,8 @@ public class BaseCondition {
         
         public Criteria andValueIn(String key, List<Object> values)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " in", values, key);
@@ -533,8 +540,8 @@ public class BaseCondition {
         
         public Criteria andValueNotIn(String key, List<Object> values)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " not in", values, key);
@@ -543,8 +550,8 @@ public class BaseCondition {
         
         public Criteria andValueBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " between", value1, value2, key);
@@ -553,8 +560,8 @@ public class BaseCondition {
         
         public Criteria andValueNotBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             removeByCondition(key + " =");
             addAndCriterion(key + " not between", value1, value2, key);
@@ -565,8 +572,8 @@ public class BaseCondition {
 
         public Criteria orValueIsNull(String key)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " is null");
             return (Criteria)this;
@@ -574,8 +581,8 @@ public class BaseCondition {
 
         public Criteria orValueIsNotNull(String key)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " is not null");
             return (Criteria)this;
@@ -583,8 +590,8 @@ public class BaseCondition {
 
         public Criteria orValueEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " =", value, key);
             return (Criteria)this;
@@ -592,8 +599,8 @@ public class BaseCondition {
 
         public Criteria orValueNotEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " <>", value, key);
             return (Criteria)this;
@@ -601,11 +608,11 @@ public class BaseCondition {
 
         public Criteria orValueLike(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
-            if (value != null && !value.toString().startsWith("%") &&  !value.toString().startsWith("%")){
-                value = "%" + value + "%" ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
+                value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
             addAndCriterion(key + " like", value, key);
             return (Criteria)this;
@@ -613,11 +620,11 @@ public class BaseCondition {
 
         public Criteria orValueNotLike(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
-            if (value != null && !value.toString().startsWith("%") &&  !value.toString().startsWith("%")){
-                value = "%" + value + "%" ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
+                value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
             addAndCriterion(key + " not like", value, key);
             return (Criteria)this;
@@ -625,8 +632,8 @@ public class BaseCondition {
 
         public Criteria orValueGreaterThan(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " >", value, key);
             return (Criteria)this;
@@ -634,8 +641,8 @@ public class BaseCondition {
 
         public Criteria orValueGreaterThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " >=", value, key);
             return (Criteria)this;
@@ -643,8 +650,8 @@ public class BaseCondition {
 
         public Criteria orValueLessThan(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " <", value, key);
             return (Criteria)this;
@@ -652,8 +659,8 @@ public class BaseCondition {
 
         public Criteria orValueLessThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " <=", value, key);
             return (Criteria)this;
@@ -661,8 +668,8 @@ public class BaseCondition {
 
         public Criteria orValueIn(String key, List<Object> values)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " in", values, key);
             return (Criteria)this;
@@ -670,8 +677,8 @@ public class BaseCondition {
 
         public Criteria orValueNotIn(String key, List<Object> values)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " not in", values, key);
             return (Criteria)this;
@@ -679,8 +686,8 @@ public class BaseCondition {
 
         public Criteria orValueBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " between", value1, value2, key);
             return (Criteria)this;
@@ -688,8 +695,8 @@ public class BaseCondition {
 
         public Criteria orValueNotBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith("`") && !key.endsWith("`")){
-                key = "`" + key + "`";
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
             }
             addOrCriterion(key + " not between", value1, value2, key);
             return (Criteria)this;

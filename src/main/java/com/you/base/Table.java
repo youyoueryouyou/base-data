@@ -3,7 +3,7 @@ package com.you.base;
 import java.lang.annotation.*;
 
 /**
- * Created by shicz on 2018/5/21.
+ * @author shicz
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

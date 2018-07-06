@@ -1,7 +1,7 @@
 package com.you.base;
 
 /**
- * Created by shicz on 2018/5/21.
+ * @author shicz
  */
 public class ColumnMap
 {
