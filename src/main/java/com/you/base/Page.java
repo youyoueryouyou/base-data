@@ -13,7 +13,15 @@ public class Page<T>
     {
         
     }
-    
+
+    public Page(BaseModel model)
+    {
+        if (model !=null && model.getPageNo() != null && model.getPageSize() != null){
+            this.pageNo = model.getPageNo();
+            this.pageSize = model.getPageSize();
+        }
+    }
+
     public Page(Integer pageNo, Integer pageSize)
     {
         if (pageNo != null && pageSize != null){

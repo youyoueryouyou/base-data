@@ -33,6 +33,13 @@ public class BaseModel implements Serializable
     @JSONField(serialize = false)
     public String getTableName()
     {
+        if (tableName == null || "".equals(tableName)){
+            try {
+                initColumn();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         return tableName;
     }
     
@@ -45,6 +52,13 @@ public class BaseModel implements Serializable
     @JSONField(serialize = false)
     public List<ColumnMap> getColumns()
     {
+        if (columns == null || columns.isEmpty()){
+            try {
+                initColumn();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         return columns;
     }
     
