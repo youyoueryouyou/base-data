@@ -15,7 +15,8 @@ public class BaseCondition {
 
     private Boolean distinct;
     private String tableName;
-    
+    private Boolean unionTable = false;
+
     private String orderByClause;
     private List<ColumnMap> columns;
     
@@ -103,11 +104,13 @@ public class BaseCondition {
         }
         else if (!tableName.trim().startsWith(LEFT_BRACKET) && tableName.split(EMPTY_SIGN).length != 1)
         {
-            this.tableName = LEFT_BRACKET + tableName + ") as " + this.tableName;
+            this.tableName = LEFT_BRACKET + tableName + RIGHT_BRACKET +" as " + this.tableName;
+            this.unionTable = true;
         }
         else
         {
             this.tableName = tableName;
+            this.unionTable = true;
         }
     }
 
