@@ -185,7 +185,12 @@
         <if test="distinct" >
             distinct
         </if>
-        <include refid="Base_Column_List" />
+        <choose>
+            <when test="!distinct and unionTable"> * </when>
+            <otherwise>
+                <include refid="Base_Column_List" />
+            </otherwise>
+        </choose>
         from ${tableName}
         <if test="_parameter != null" >
             <include refid="Where_Select_Condition" />
