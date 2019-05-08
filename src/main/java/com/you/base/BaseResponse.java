@@ -90,4 +90,12 @@ public class BaseResponse {
         return response;
     }
 
+    public static BaseResponse failureMessage(Integer code,String message){
+        BaseResponse response = new BaseResponse();
+        response.setSuccess(false);
+        response.setCode(code);
+        response.setMessage(message);
+        return response;
+    }
+
 }
