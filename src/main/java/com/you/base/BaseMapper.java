@@ -73,14 +73,14 @@ public interface BaseMapper<M extends BaseModel, C extends BaseCondition>
      * @param model
      * @return BasePojo
      */
-    public BasePojo selectByPrimaryKey(M model);
+    public M selectByPrimaryKey(M model);
 
     /***
      * 根据动态条件查询数据
      * @param condition
      * @return List<BasePojo>
      */
-    public List<BasePojo> selectByCondition(C condition);
+    public List<M> selectByCondition(C condition);
 
     /***
      * 根据动态条件查询数据总数
