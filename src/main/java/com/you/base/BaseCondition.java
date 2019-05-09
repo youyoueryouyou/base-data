@@ -27,6 +27,7 @@ public class BaseCondition {
     private Integer rows;
 
     private Criteria currentCriteria;
+    private BaseModel model;
     private BaseCondition(){
 
     }
@@ -36,8 +37,13 @@ public class BaseCondition {
     }
 
     protected BaseCondition(BaseModel model) throws Exception{
+        this.model = model;
         oredCriteria = new ArrayList<Criteria>();
         initByModel(model);
+    }
+
+    public BaseModel getModel(){
+        return model;
     }
 
     public String getOrderByClause()

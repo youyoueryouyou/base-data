@@ -212,7 +212,7 @@
         </if>
     </select>
 
-    <select id="selectBySql" parameterType="string" resultType="map">
+    <select id="selectBySql" parameterType="string" resultType="com.you.base.BasePojo">
         ${sql}
     </select>
 </mapper>

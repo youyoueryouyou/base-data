@@ -73,7 +73,7 @@ public interface BaseMapper<M extends BaseModel, C extends BaseCondition>
      * @param model
      * @return BasePojo
      */
-    public M selectByPrimaryKey(M model);
+    public Object selectByPrimaryKey(M model);
 
     /***
      * 根据动态条件查询数据
@@ -94,5 +94,5 @@ public interface BaseMapper<M extends BaseModel, C extends BaseCondition>
      * @param sql
      * @return List<Map>
      */
-    public List<Map> selectBySql(@Param("sql") String sql);
+    public List<BasePojo> selectBySql(@Param("sql") String sql);
 }
