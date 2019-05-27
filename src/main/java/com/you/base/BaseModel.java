@@ -167,4 +167,12 @@ public class BaseModel implements Serializable
             }
         }
     }
+    @JSONField(serialize = false)
+    public void clearThis(){
+        this.pageNo = null;
+        this.pageSize = null;
+        this.columns = null;
+        this.tableName = null;
+        this.orderByClause = null;
+    }
 }

@@ -1,9 +1,11 @@
 package com.you.base;
 
+import java.io.Serializable;
+
 /**
  * @author shicz
  */
-public class ColumnMap
+public class ColumnMap implements Serializable
 {
     private String columnName;
     
