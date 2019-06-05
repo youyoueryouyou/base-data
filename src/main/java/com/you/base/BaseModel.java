@@ -22,7 +22,10 @@ public class BaseModel implements Serializable
     private Integer pageSize = null;
 
     @JSONField(serialize = false)
-    private String orderByClause;
+    private String orderKey;
+
+    @JSONField(serialize = false)
+    private String orderType;
 
     @JSONField(serialize = false)
     private String tableName;
@@ -93,13 +96,23 @@ public class BaseModel implements Serializable
     }
 
     @JSONField(serialize = false)
-    public String getOrderByClause() {
-        return orderByClause;
+    public String getOrderKey() {
+        return orderKey;
     }
 
     @JSONField(serialize = false)
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
+    public void setOrderKey(String orderKey) {
+        this.orderKey = orderKey;
+    }
+
+    @JSONField(serialize = false)
+    public String getOrderType() {
+        return orderType;
+    }
+
+    @JSONField(serialize = false)
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
     @JSONField(serialize = false)
@@ -173,6 +186,7 @@ public class BaseModel implements Serializable
         this.pageSize = null;
         this.columns = null;
         this.tableName = null;
-        this.orderByClause = null;
+        this.orderKey = null;
+        this.orderType = null;
     }
 }

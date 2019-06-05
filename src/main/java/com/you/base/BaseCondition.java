@@ -140,8 +140,17 @@ public class BaseCondition {
             setOffset((model.getPageNo() - 1) * model.getPageSize());
             setRows(model.getPageSize());
         }
-        if (model.getOrderByClause() != null && !"".equals(model.getOrderByClause())){
-            setOrderByClause(model.getOrderByClause());
+        if (model.getOrderKey() != null && !"".equals(model.getOrderKey())){
+            String orderKey = null;
+            for (ColumnMap map : columns){
+                if (model.getOrderKey().equalsIgnoreCase(map.getFieldName())||model.getOrderKey().equalsIgnoreCase(map.getColumnName())){
+                    orderKey = map.getColumnName();
+                }
+            }
+            String orderType = model.getOrderType() == null ? "" : ("desc".equals(model.getOrderType().trim().toLowerCase()) ? "desc" : "");
+            if (orderKey != null){
+                setOrderByClause(orderType+" "+orderType);
+            }
         }
     }
     
