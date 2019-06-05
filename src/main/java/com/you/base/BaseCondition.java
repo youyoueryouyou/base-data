@@ -149,7 +149,7 @@ public class BaseCondition {
             }
             String orderType = model.getOrderType() == null ? "" : ("desc".equals(model.getOrderType().trim().toLowerCase()) ? "desc" : "");
             if (orderKey != null){
-                setOrderByClause(orderType+" "+orderType);
+                setOrderByClause(orderKey+" "+orderType);
             }
         }
     }
