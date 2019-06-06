@@ -34,6 +34,9 @@ public class BaseModel implements Serializable
     private List<ColumnMap> columns;
 
     @JSONField(serialize = false)
+    private List<BaseParam> params;
+
+    @JSONField(serialize = false)
     public String getTableName()
     {
         if (tableName == null || "".equals(tableName)){
@@ -70,7 +73,17 @@ public class BaseModel implements Serializable
     {
         this.columns = columns;
     }
-    
+
+    @JSONField(serialize = false)
+    public List<BaseParam> getParams() {
+        return params;
+    }
+
+    @JSONField(serialize = false)
+    public void setParams(List<BaseParam> params) {
+        this.params = params;
+    }
+
     @JSONField(serialize = false)
     public Integer getPageNo()
     {

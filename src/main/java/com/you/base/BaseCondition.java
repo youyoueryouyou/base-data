@@ -130,6 +130,21 @@ public class BaseCondition {
                 criteria.andValueEqualTo(map.getColumnName(),map.getColumnValue());
             }
         }
+        if (model.getParams() != null){
+            for (BaseParam param : model.getParams()){
+                if (param.getCloumn() != null && !"".equals(param.getCloumn()) && param.getOperator() != null){
+                    if (param.getValue() != null && !"".equals(param.getValue().toString().trim())){
+                        if (param.getOperator() == Operator.LK || param.getOperator() == Operator.NLK){
+                            criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue(),"%"+param.getValue().toString()+"%",param.getCloumn());
+                        } else {
+                            criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue(),param.getValue(),param.getCloumn());
+                        }
+                    }else if (param.getOperator() == Operator.EP || param.getOperator() == Operator.NEP){
+                        criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue());
+                    } 
+                }
+            }
+        }
         if (criteria.isValid()){
             oredCriteria.add(criteria);
         }
@@ -440,11 +455,17 @@ public class BaseCondition {
             criteria.add(new Criterion(condition, value1, value2, "or"));
         }
         
+        protected String getKey(String key){
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+                return REVERSE_QUOTATION + key + REVERSE_QUOTATION;
+            }else {
+                return key;
+            }
+        }
+        
         public Criteria andValueIsNull(String key)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " is null");
             return (Criteria)this;
@@ -452,9 +473,7 @@ public class BaseCondition {
         
         public Criteria andValueIsNotNull(String key)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " is not null");
             return (Criteria)this;
@@ -462,9 +481,7 @@ public class BaseCondition {
         
         public Criteria andValueEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " =", value, key);
             return (Criteria)this;
@@ -472,9 +489,7 @@ public class BaseCondition {
         
         public Criteria andValueNotEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <>", value, key);
             return (Criteria)this;
@@ -482,9 +497,7 @@ public class BaseCondition {
 
         public Criteria andValueLike(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
                 value = PERCENT_SIGN + value + PERCENT_SIGN ;
@@ -495,9 +508,7 @@ public class BaseCondition {
 
         public Criteria andValueNotLike(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
                 value = PERCENT_SIGN + value + PERCENT_SIGN ;
@@ -508,9 +519,7 @@ public class BaseCondition {
         
         public Criteria andValueGreaterThan(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " >", value, key);
             return (Criteria)this;
@@ -518,9 +527,7 @@ public class BaseCondition {
         
         public Criteria andValueGreaterThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " >=", value, key);
             return (Criteria)this;
@@ -528,9 +535,7 @@ public class BaseCondition {
         
         public Criteria andValueLessThan(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <", value, key);
             return (Criteria)this;
@@ -538,9 +543,7 @@ public class BaseCondition {
         
         public Criteria andValueLessThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <=", value, key);
             return (Criteria)this;
@@ -548,9 +551,7 @@ public class BaseCondition {
         
         public Criteria andValueIn(String key, List<Object> values)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " in", values, key);
             return (Criteria)this;
@@ -558,9 +559,7 @@ public class BaseCondition {
         
         public Criteria andValueNotIn(String key, List<Object> values)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " not in", values, key);
             return (Criteria)this;
@@ -568,9 +567,7 @@ public class BaseCondition {
         
         public Criteria andValueBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " between", value1, value2, key);
             return (Criteria)this;
@@ -578,9 +575,7 @@ public class BaseCondition {
         
         public Criteria andValueNotBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " not between", value1, value2, key);
             return (Criteria)this;
@@ -590,45 +585,35 @@ public class BaseCondition {
 
         public Criteria orValueIsNull(String key)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " is null");
             return (Criteria)this;
         }
 
         public Criteria orValueIsNotNull(String key)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " is not null");
             return (Criteria)this;
         }
 
         public Criteria orValueEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " =", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueNotEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " <>", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueLike(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
                 value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
@@ -638,9 +623,7 @@ public class BaseCondition {
 
         public Criteria orValueNotLike(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
                 value = PERCENT_SIGN + value + PERCENT_SIGN ;
             }
@@ -650,72 +633,56 @@ public class BaseCondition {
 
         public Criteria orValueGreaterThan(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " >", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueGreaterThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " >=", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueLessThan(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " <", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueLessThanOrEqualTo(String key, Object value)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " <=", value, key);
             return (Criteria)this;
         }
 
         public Criteria orValueIn(String key, List<Object> values)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " in", values, key);
             return (Criteria)this;
         }
 
         public Criteria orValueNotIn(String key, List<Object> values)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " not in", values, key);
             return (Criteria)this;
         }
 
         public Criteria orValueBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " between", value1, value2, key);
             return (Criteria)this;
         }
 
         public Criteria orValueNotBetween(String key, Object value1, Object value2)
         {
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
-                key = REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }
+            key = getKey(key);
             addOrCriterion(key + " not between", value1, value2, key);
             return (Criteria)this;
         }
