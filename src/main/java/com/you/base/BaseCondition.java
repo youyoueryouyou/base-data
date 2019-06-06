@@ -124,6 +124,8 @@ public class BaseCondition {
         if (model.getColumns() == null){
             model.initColumn();
         }
+        setTableName(model.getTableName());
+        setColumns(model.getColumns());
         Criteria criteria = getCriteria();
         for (ColumnMap map : model.getColumns()){
             if (map.getColumnValue() != null){
@@ -160,8 +162,6 @@ public class BaseCondition {
         if (criteria.isValid()){
             oredCriteria.add(criteria);
         }
-        setTableName(model.getTableName());
-        setColumns(model.getColumns());
         if (model.getPageNo() != null && model.getPageNo() > 0 && model.getPageSize() != null  && model.getPageSize() > 0)
         {
             setOffset((model.getPageNo() - 1) * model.getPageSize());
