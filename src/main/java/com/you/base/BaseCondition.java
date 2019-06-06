@@ -132,15 +132,27 @@ public class BaseCondition {
         }
         if (model.getParams() != null){
             for (BaseParam param : model.getParams()){
-                if (param.getCloumn() != null && !"".equals(param.getCloumn()) && param.getOperator() != null){
+                if (param.getColumn() != null && !"".equals(param.getColumn()) && param.getOperator() != null){
+                    String cloumn = null;
+                    for (ColumnMap map : columns){
+                        if (param.getColumn().equalsIgnoreCase(map.getFieldName())||param.getColumn().equalsIgnoreCase(map.getColumnName())){
+                            cloumn = map.getColumnName();
+                            break;
+                        }
+                    }
+                    if (cloumn == null){
+                        continue;
+                    }else {
+                        cloumn = criteria.getKey(cloumn);
+                    }
                     if (param.getValue() != null && !"".equals(param.getValue().toString().trim())){
                         if (param.getOperator() == Operator.LK || param.getOperator() == Operator.NLK){
-                            criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue(),"%"+param.getValue().toString()+"%",param.getCloumn());
+                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),"%"+param.getValue().toString()+"%",cloumn);
                         } else {
-                            criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue(),param.getValue(),param.getCloumn());
+                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),param.getValue(),cloumn);
                         }
                     }else if (param.getOperator() == Operator.EP || param.getOperator() == Operator.NEP){
-                        criteria.addAndCriterion(criteria.getKey(param.getCloumn()) + " "+param.getOperator().getValue());
+                        criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue());
                     } 
                 }
             }
@@ -160,6 +172,7 @@ public class BaseCondition {
             for (ColumnMap map : columns){
                 if (model.getOrderKey().equalsIgnoreCase(map.getFieldName())||model.getOrderKey().equalsIgnoreCase(map.getColumnName())){
                     orderKey = map.getColumnName();
+                    break;
                 }
             }
             String orderType = model.getOrderType() == null ? "" : ("desc".equals(model.getOrderType().trim().toLowerCase()) ? "desc" : "");

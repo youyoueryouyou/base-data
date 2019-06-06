@@ -1,16 +1,16 @@
 package com.you.base;
 
 public class BaseParam {
-    private String cloumn;
+    private String column;
     private Object value;
     private Operator operator;
 
-    public String getCloumn() {
-        return cloumn;
+    public String getColumn() {
+        return column;
     }
 
-    public void setCloumn(String cloumn) {
-        this.cloumn = cloumn;
+    public void setColumn(String column) {
+        this.column = column;
     }
 
     public Object getValue() {
