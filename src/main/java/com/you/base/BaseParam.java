@@ -2,6 +2,7 @@ package com.you.base;
 
 public class BaseParam {
     private String column;
+    private String type;
     private Object value;
     private Operator operator;
 
@@ -11,6 +12,14 @@ public class BaseParam {
 
     public void setColumn(String column) {
         this.column = column;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Object getValue() {

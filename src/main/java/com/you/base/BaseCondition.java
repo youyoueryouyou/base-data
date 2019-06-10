@@ -1,6 +1,10 @@
 package com.you.base;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -120,6 +124,19 @@ public class BaseCondition {
         }
     }
 
+    private Date utcToDate(String utcTime) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            Date date = sdf.parse(utcTime);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 8);
+            return calendar.getTime();
+        }catch (Exception e){
+            return null;
+        }
+    }
+
     protected void initByModel(BaseModel model) throws Exception{
         if (model.getColumns() == null){
             model.initColumn();
@@ -151,7 +168,11 @@ public class BaseCondition {
                         if (param.getOperator() == Operator.LK || param.getOperator() == Operator.NLK){
                             criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),"%"+param.getValue().toString()+"%",cloumn);
                         } else {
-                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),param.getValue(),cloumn);
+                            Object value = param.getValue();
+                            if ("date".equals(param.getType())){
+                                value = utcToDate(param.getValue().toString());
+                            }
+                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),value,cloumn);
                         }
                     }else if (param.getOperator() == Operator.EP || param.getOperator() == Operator.NEP){
                         criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue());
