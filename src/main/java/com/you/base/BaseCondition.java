@@ -180,9 +180,7 @@ public class BaseCondition {
                 }
             }
         }
-        if (criteria.isValid()){
-            oredCriteria.add(criteria);
-        }
+        oredCriteria.add(criteria);
         if (model.getPageNo() != null && model.getPageNo() > 0 && model.getPageSize() != null  && model.getPageSize() > 0)
         {
             setOffset((model.getPageNo() - 1) * model.getPageSize());
