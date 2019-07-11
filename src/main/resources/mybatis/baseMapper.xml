@@ -6,7 +6,15 @@
     <sql id="Base_Column_List">
         <trim suffixOverrides=",">
             <foreach collection="columns" item="column" >
-                `${column.columnName}`,
+                <choose>
+                    <when test="column.columnName.indexOf('(') == 0">
+                        ${column.columnName},
+                    </when>
+                    <otherwise>
+                        `${column.columnName}`,
+                    </otherwise>
+                </choose>
+
             </foreach>
         </trim>
     </sql>

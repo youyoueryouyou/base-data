@@ -44,6 +44,7 @@ public class BasePojo extends TreeMap<String, Object> implements Serializable {
                     field.setAccessible(true);
                     field.set(object,value);
                 }catch (Exception e){
+                    System.err.println("field="+field.getName()+",value="+value+",fieldType="+field.getType().getName()+",valueType="+value.getClass().getName());
                     e.printStackTrace();
                 }
             }
