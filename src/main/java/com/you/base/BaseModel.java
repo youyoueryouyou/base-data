@@ -151,6 +151,7 @@ public class BaseModel implements Serializable {
                 }
             }
         }
+        model.setColumns(list);
         return model;
     }
 
