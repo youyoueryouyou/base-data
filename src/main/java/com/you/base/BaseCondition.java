@@ -23,16 +23,17 @@ public class BaseCondition {
 
     private String orderByClause;
     private List<ColumnMap> columns;
-    
+
     protected List<Criteria> oredCriteria;
-    
+
     private Integer offset;
-    
+
     private Integer rows;
 
     private Criteria currentCriteria;
     private BaseModel model;
-    private BaseCondition(){
+
+    private BaseCondition() {
 
     }
 
@@ -40,57 +41,49 @@ public class BaseCondition {
         this.currentCriteria = currentCriteria;
     }
 
-    protected BaseCondition(BaseModel model) throws Exception{
+    protected BaseCondition(BaseModel model) throws Exception {
         this.model = model;
         oredCriteria = new ArrayList<Criteria>();
         initByModel(model);
     }
 
-    public BaseModel getModel(){
+    public BaseModel getModel() {
         return model;
     }
 
-    public String getOrderByClause()
-    {
+    public String getOrderByClause() {
         return orderByClause;
     }
-    
-    public void setOrderByClause(String orderByClause)
-    {
+
+    public void setOrderByClause(String orderByClause) {
         this.orderByClause = orderByClause;
     }
-    
-    public Boolean getDistinct()
-    {
+
+    public Boolean getDistinct() {
         return distinct;
     }
-    
-    public void setDistinct(Boolean distinct)
-    {
+
+    public void setDistinct(Boolean distinct) {
         this.distinct = distinct;
     }
-    
-    public Integer getOffset()
-    {
+
+    public Integer getOffset() {
         return offset;
     }
-    
-    public void setOffset(Integer offset)
-    {
+
+    public void setOffset(Integer offset) {
         this.offset = offset;
     }
-    
-    public Integer getRows()
-    {
+
+    public Integer getRows() {
         return rows;
     }
-    
-    public void setRows(Integer rows)
-    {
+
+    public void setRows(Integer rows) {
         this.rows = rows;
     }
 
-    public void setPage(Integer offset,Integer rows){
+    public void setPage(Integer offset, Integer rows) {
         this.offset = offset;
         this.rows = rows;
     }
@@ -108,17 +101,12 @@ public class BaseCondition {
     }
 
     public void setTableName(String tableName) {
-        if (this.tableName == null || "".equals(this.tableName))
-        {
+        if (this.tableName == null || "".equals(this.tableName)) {
             this.tableName = tableName;
-        }
-        else if (!tableName.trim().startsWith(LEFT_BRACKET) && tableName.split(EMPTY_SIGN).length != 1)
-        {
-            this.tableName = LEFT_BRACKET + tableName + RIGHT_BRACKET +" as " + this.tableName;
+        } else if (!tableName.trim().startsWith(LEFT_BRACKET) && tableName.split(EMPTY_SIGN).length != 1) {
+            this.tableName = LEFT_BRACKET + tableName + RIGHT_BRACKET + " as " + this.tableName;
             this.unionTable = true;
-        }
-        else
-        {
+        } else {
             this.tableName = tableName;
             this.unionTable = true;
         }
@@ -132,98 +120,102 @@ public class BaseCondition {
             calendar.setTime(date);
             calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 8);
             return calendar.getTime();
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    protected void initByModel(BaseModel model) throws Exception{
-        if (model.getColumns() == null){
+    private void initParam(BaseParam param) {
+        Criteria criteria = getCriteria();
+        if (param.getColumn() != null && !"".equals(param.getColumn()) && param.getOperator() != null) {
+            String cloumn = null;
+            for (ColumnMap map : columns) {
+                if (param.getColumn().equalsIgnoreCase(map.getFieldName()) || param.getColumn().equalsIgnoreCase(map.getColumnName())) {
+                    cloumn = map.getColumnName();
+                    break;
+                }
+            }
+            if (cloumn != null) {
+                cloumn = criteria.getKey(cloumn);
+                if (param.getValue() != null && !"".equals(param.getValue().toString().trim())) {
+                    if (param.getOperator() == Operator.LK || param.getOperator() == Operator.NLK) {
+                        criteria.addAndCriterion(cloumn + " " + param.getOperator().getValue(), "%" + param.getValue().toString() + "%", cloumn);
+                    } else {
+                        Object value = param.getValue();
+                        if ("date".equals(param.getType())) {
+                            value = utcToDate(param.getValue().toString());
+                        }
+                        criteria.addAndCriterion(cloumn + " " + param.getOperator().getValue(), value, cloumn);
+                    }
+                } else if (param.getOperator() == Operator.EP || param.getOperator() == Operator.NEP) {
+                    criteria.addAndCriterion(cloumn + " " + param.getOperator().getValue());
+                }
+            }
+        }
+    }
+
+    protected void initByModel(BaseModel model) throws Exception {
+        if (model.getColumns() == null) {
             model.initColumn();
         }
         setTableName(model.getTableName());
         setColumns(model.getColumns());
-        Criteria criteria = getCriteria();
-        for (ColumnMap map : model.getColumns()){
-            if (map.getColumnValue() != null){
-                criteria.andValueEqualTo(map.getColumnName(),map.getColumnValue());
+        for (ColumnMap map : model.getColumns()) {
+            if (map.getColumnValue() != null) {
+                getCriteria().andValueEqualTo(map.getColumnName(), map.getColumnValue());
             }
         }
-        if (model.getParams() != null){
-            for (BaseParam param : model.getParams()){
-                if (param.getColumn() != null && !"".equals(param.getColumn()) && param.getOperator() != null){
-                    String cloumn = null;
-                    for (ColumnMap map : columns){
-                        if (param.getColumn().equalsIgnoreCase(map.getFieldName())||param.getColumn().equalsIgnoreCase(map.getColumnName())){
-                            cloumn = map.getColumnName();
-                            break;
-                        }
-                    }
-                    if (cloumn == null){
-                        continue;
-                    }else {
-                        cloumn = criteria.getKey(cloumn);
-                    }
-                    if (param.getValue() != null && !"".equals(param.getValue().toString().trim())){
-                        if (param.getOperator() == Operator.LK || param.getOperator() == Operator.NLK){
-                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),"%"+param.getValue().toString()+"%",cloumn);
-                        } else {
-                            Object value = param.getValue();
-                            if ("date".equals(param.getType())){
-                                value = utcToDate(param.getValue().toString());
-                            }
-                            criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue(),value,cloumn);
-                        }
-                    }else if (param.getOperator() == Operator.EP || param.getOperator() == Operator.NEP){
-                        criteria.addAndCriterion(cloumn + " "+param.getOperator().getValue());
-                    } 
-                }
+        if (model.getParams() != null) {
+            for (BaseParam param : model.getParams()) {
+                initParam(param);
             }
         }
-        oredCriteria.add(criteria);
-        if (model.getPageNo() != null && model.getPageNo() > 0 && model.getPageSize() != null  && model.getPageSize() > 0)
-        {
+        oredCriteria.add(getCriteria());
+        if (model.getPageNo() != null && model.getPageNo() > 0 && model.getPageSize() != null && model.getPageSize() > 0) {
             setOffset((model.getPageNo() - 1) * model.getPageSize());
             setRows(model.getPageSize());
         }
-        if (model.getOrderKey() != null && !"".equals(model.getOrderKey())){
+        if (model.getOrderKey() != null && !"".equals(model.getOrderKey())) {
             String orderKey = null;
-            for (ColumnMap map : columns){
-                if (model.getOrderKey().equalsIgnoreCase(map.getFieldName())||model.getOrderKey().equalsIgnoreCase(map.getColumnName())){
+            for (ColumnMap map : columns) {
+                if (model.getOrderKey().equalsIgnoreCase(map.getFieldName()) || model.getOrderKey().equalsIgnoreCase(map.getColumnName())) {
                     orderKey = map.getColumnName();
                     break;
                 }
             }
             String orderType = model.getOrderType() == null ? "" : ("desc".equals(model.getOrderType().trim().toLowerCase()) ? "desc" : "");
-            if (orderKey != null){
-                setOrderByClause(orderKey+" "+orderType);
+            if (orderKey != null) {
+                setOrderByClause(orderKey + " " + orderType);
             }
         }
     }
-    
-    public Boolean addColumn(String name)
-    {
-        List<ColumnMap> columns = getColumns();
-        if (columns == null || name == null || "".equals(name))
-        {
+
+    public Boolean addColumn(String name) {
+        if (columns == null || name == null || "".equals(name)) {
             return false;
-        }
-        else
-        {
+        } else {
             Boolean result = true;
-            for (ColumnMap columnMap : columns)
-            {
-                if (name.equals(columnMap.getColumnName()))
-                {
+            for (ColumnMap columnMap : columns) {
+                if (name.equals(columnMap.getColumnName())) {
                     result = false;
                     break;
                 }
             }
-            if (result)
-            {
+            if (result) {
                 ColumnMap columnMap = new ColumnMap();
                 columnMap.setColumnName(name);
+                columnMap.setColumnValue(model.getColumnValue(name));
                 columns.add(columnMap);
+                if (columnMap.getColumnValue() != null) {
+                    getCriteria().andValueEqualTo(name, columnMap.getColumnValue());
+                }
+                if (model.getParams() != null) {
+                    for (BaseParam param : model.getParams()) {
+                        if (name.equalsIgnoreCase(param.getColumn())) {
+                            initParam(param);
+                        }
+                    }
+                }
             }
             return result;
         }
@@ -241,7 +233,7 @@ public class BaseCondition {
 
     public Criteria getCriteria() {
         if (currentCriteria == null) {
-           currentCriteria = createAndCriteriaInternal();
+            currentCriteria = createAndCriteriaInternal();
         }
         return currentCriteria;
     }
@@ -277,75 +269,63 @@ public class BaseCondition {
         offset = null;
     }
 
-    public static class Criteria extends AbstractGeneratedCriteria
-    {
-        
-        protected Criteria(String typeHandler)
-        {
+    public static class Criteria extends AbstractGeneratedCriteria {
+
+        protected Criteria(String typeHandler) {
             super(typeHandler);
         }
     }
-    
-    public static class Criterion
-    {
+
+    public static class Criterion {
         private String condition;
-        
+
         private Object value;
-        
+
         private Object secondValue;
-        
+
         private boolean noValue;
-        
+
         private boolean singleValue;
-        
+
         private boolean betweenValue;
-        
+
         private boolean listValue;
-        
+
         private String typeHandler;
-        
-        public String getCondition()
-        {
+
+        public String getCondition() {
             return condition;
         }
-        
-        public Object getValue()
-        {
+
+        public Object getValue() {
             return value;
         }
-        
-        public Object getSecondValue()
-        {
+
+        public Object getSecondValue() {
             return secondValue;
         }
-        
-        public boolean isNoValue()
-        {
+
+        public boolean isNoValue() {
             return noValue;
         }
-        
-        public boolean isSingleValue()
-        {
+
+        public boolean isSingleValue() {
             return singleValue;
         }
-        
-        public boolean isBetweenValue()
-        {
+
+        public boolean isBetweenValue() {
             return betweenValue;
         }
-        
-        public boolean isListValue()
-        {
+
+        public boolean isListValue() {
             return listValue;
         }
-        
-        public String getTypeHandler()
-        {
+
+        public String getTypeHandler() {
             return typeHandler;
         }
-        
-        protected Criterion(String condition,String typeHandler)
-        {
+
+        protected Criterion(String condition, String typeHandler) {
             super();
             this.condition = condition;
             this.typeHandler = typeHandler;
@@ -353,24 +333,19 @@ public class BaseCondition {
         }
 
 
-        protected Criterion(String condition, Object value, String typeHandler)
-        {
+        protected Criterion(String condition, Object value, String typeHandler) {
             super();
             this.condition = condition;
             this.value = value;
             this.typeHandler = typeHandler;
-            if (value instanceof List<?>)
-            {
+            if (value instanceof List<?>) {
                 this.listValue = true;
-            }
-            else
-            {
+            } else {
                 this.singleValue = true;
             }
         }
 
-        protected Criterion(String condition, Object value, Object secondValue, String typeHandler)
-        {
+        protected Criterion(String condition, Object value, Object secondValue, String typeHandler) {
             super();
             this.condition = condition;
             this.value = value;
@@ -380,16 +355,14 @@ public class BaseCondition {
         }
 
     }
-    
-    public static abstract class AbstractGeneratedCriteria
-    {
+
+    public static abstract class AbstractGeneratedCriteria {
         private final String REVERSE_QUOTATION = "`";
-        private final String PERCENT_SIGN  = "%";
+        private final String PERCENT_SIGN = "%";
         protected List<Criterion> criteria;
         private String typeHandler;
-        
-        protected AbstractGeneratedCriteria(String typeHandler)
-        {
+
+        protected AbstractGeneratedCriteria(String typeHandler) {
             super();
             this.typeHandler = typeHandler;
             criteria = new ArrayList<Criterion>();
@@ -403,320 +376,276 @@ public class BaseCondition {
             this.typeHandler = typeHandler;
         }
 
-        public boolean isValid()
-        {
+        public boolean isValid() {
             return criteria.size() > 0;
         }
-        
-        public List<Criterion> getAllCriteria()
-        {
+
+        public List<Criterion> getAllCriteria() {
             return criteria;
         }
 
-        public void removeByCondition(String newCond){
+        public void removeByCondition(String newCond) {
             int index = -1;
-            for (int i = 0; i < getAllCriteria().size();i++){
-              Criterion  criterion = getAllCriteria().get(i);
-              String oldCond =  criterion.getCondition();
-              if (newCond.trim().replace(" ","").equals(oldCond.trim().replace(" ",""))){
-                  index = i;
-              }
+            for (int i = 0; i < getAllCriteria().size(); i++) {
+                Criterion criterion = getAllCriteria().get(i);
+                String oldCond = criterion.getCondition();
+                if (newCond.trim().replace(" ", "").equals(oldCond.trim().replace(" ", ""))) {
+                    index = i;
+                }
             }
-            if (index > -1){
+            if (index > -1) {
                 getAllCriteria().remove(index);
             }
         }
 
-        public List<Criterion> getCriteria()
-        {
+        public List<Criterion> getCriteria() {
             return criteria;
         }
-        
-        protected void addAndCriterion(String condition)
-    {
-        if (condition == null)
-        {
-            return;
-        }
-        criteria.add(new Criterion(condition, "and"));
-    }
 
-        protected void addAndCriterion(String condition, Object value, String property)
-        {
-            if (value == null)
-            {
+        protected void addAndCriterion(String condition) {
+            if (condition == null) {
+                return;
+            }
+            criteria.add(new Criterion(condition, "and"));
+        }
+
+        protected void addAndCriterion(String condition, Object value, String property) {
+            if (value == null) {
                 return;
             }
             criteria.add(new Criterion(condition, value, "and"));
         }
 
-        protected void addAndCriterion(String condition, Object value1, Object value2, String property)
-        {
-            if (value1 == null || value2 == null)
-            {
+        protected void addAndCriterion(String condition, Object value1, Object value2, String property) {
+            if (value1 == null || value2 == null) {
                 throw new RuntimeException("Between values for " + property + " cannot be null");
             }
             criteria.add(new Criterion(condition, value1, value2, "and"));
         }
 
 
-        protected void addOrCriterion(String condition)
-        {
-            if (condition == null)
-            {
+        protected void addOrCriterion(String condition) {
+            if (condition == null) {
                 return;
             }
             criteria.add(new Criterion(condition, "or"));
         }
 
-        protected void addOrCriterion(String condition, Object value, String property)
-        {
-            if (value == null)
-            {
+        protected void addOrCriterion(String condition, Object value, String property) {
+            if (value == null) {
                 return;
             }
             criteria.add(new Criterion(condition, value, "or"));
         }
 
-        protected void addOrCriterion(String condition, Object value1, Object value2, String property)
-        {
-            if (value1 == null || value2 == null)
-            {
+        protected void addOrCriterion(String condition, Object value1, Object value2, String property) {
+            if (value1 == null || value2 == null) {
                 throw new RuntimeException("Between values for " + property + " cannot be null");
             }
             criteria.add(new Criterion(condition, value1, value2, "or"));
         }
-        
-        protected String getKey(String key){
-            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)){
+
+        protected String getKey(String key) {
+            if (!key.startsWith(REVERSE_QUOTATION) && !key.endsWith(REVERSE_QUOTATION)) {
                 return REVERSE_QUOTATION + key + REVERSE_QUOTATION;
-            }else {
+            } else {
                 return key;
             }
         }
-        
-        public Criteria andValueIsNull(String key)
-        {
+
+        public Criteria andValueIsNull(String key) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " is null");
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueIsNotNull(String key)
-        {
+
+        public Criteria andValueIsNotNull(String key) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " is not null");
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueEqualTo(String key, Object value)
-        {
+
+        public Criteria andValueEqualTo(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " =", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueNotEqualTo(String key, Object value)
-        {
+
+        public Criteria andValueNotEqualTo(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <>", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria andValueLike(String key, Object value)
-        {
+        public Criteria andValueLike(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
-            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
-                value = PERCENT_SIGN + value + PERCENT_SIGN ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) && !value.toString().startsWith(PERCENT_SIGN)) {
+                value = PERCENT_SIGN + value + PERCENT_SIGN;
             }
             addAndCriterion(key + " like", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria andValueNotLike(String key, Object value)
-        {
+        public Criteria andValueNotLike(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
-            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
-                value = PERCENT_SIGN + value + PERCENT_SIGN ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) && !value.toString().startsWith(PERCENT_SIGN)) {
+                value = PERCENT_SIGN + value + PERCENT_SIGN;
             }
             addAndCriterion(key + " not like", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueGreaterThan(String key, Object value)
-        {
+
+        public Criteria andValueGreaterThan(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " >", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueGreaterThanOrEqualTo(String key, Object value)
-        {
+
+        public Criteria andValueGreaterThanOrEqualTo(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " >=", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueLessThan(String key, Object value)
-        {
+
+        public Criteria andValueLessThan(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueLessThanOrEqualTo(String key, Object value)
-        {
+
+        public Criteria andValueLessThanOrEqualTo(String key, Object value) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " <=", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueIn(String key, List<Object> values)
-        {
+
+        public Criteria andValueIn(String key, List<Object> values) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " in", values, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueNotIn(String key, List<Object> values)
-        {
+
+        public Criteria andValueNotIn(String key, List<Object> values) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " not in", values, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueBetween(String key, Object value1, Object value2)
-        {
+
+        public Criteria andValueBetween(String key, Object value1, Object value2) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " between", value1, value2, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
-        
-        public Criteria andValueNotBetween(String key, Object value1, Object value2)
-        {
+
+        public Criteria andValueNotBetween(String key, Object value1, Object value2) {
             key = getKey(key);
             removeByCondition(key + " =");
             addAndCriterion(key + " not between", value1, value2, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
 
-
-        public Criteria orValueIsNull(String key)
-        {
+        public Criteria orValueIsNull(String key) {
             key = getKey(key);
             addOrCriterion(key + " is null");
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueIsNotNull(String key)
-        {
+        public Criteria orValueIsNotNull(String key) {
             key = getKey(key);
             addOrCriterion(key + " is not null");
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueEqualTo(String key, Object value)
-        {
+        public Criteria orValueEqualTo(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " =", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueNotEqualTo(String key, Object value)
-        {
+        public Criteria orValueNotEqualTo(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " <>", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueLike(String key, Object value)
-        {
+        public Criteria orValueLike(String key, Object value) {
             key = getKey(key);
-            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
-                value = PERCENT_SIGN + value + PERCENT_SIGN ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) && !value.toString().startsWith(PERCENT_SIGN)) {
+                value = PERCENT_SIGN + value + PERCENT_SIGN;
             }
             addAndCriterion(key + " like", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueNotLike(String key, Object value)
-        {
+        public Criteria orValueNotLike(String key, Object value) {
             key = getKey(key);
-            if (value != null && !value.toString().startsWith(PERCENT_SIGN) &&  !value.toString().startsWith(PERCENT_SIGN)){
-                value = PERCENT_SIGN + value + PERCENT_SIGN ;
+            if (value != null && !value.toString().startsWith(PERCENT_SIGN) && !value.toString().startsWith(PERCENT_SIGN)) {
+                value = PERCENT_SIGN + value + PERCENT_SIGN;
             }
             addAndCriterion(key + " not like", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueGreaterThan(String key, Object value)
-        {
+        public Criteria orValueGreaterThan(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " >", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueGreaterThanOrEqualTo(String key, Object value)
-        {
+        public Criteria orValueGreaterThanOrEqualTo(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " >=", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueLessThan(String key, Object value)
-        {
+        public Criteria orValueLessThan(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " <", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueLessThanOrEqualTo(String key, Object value)
-        {
+        public Criteria orValueLessThanOrEqualTo(String key, Object value) {
             key = getKey(key);
             addOrCriterion(key + " <=", value, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueIn(String key, List<Object> values)
-        {
+        public Criteria orValueIn(String key, List<Object> values) {
             key = getKey(key);
             addOrCriterion(key + " in", values, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueNotIn(String key, List<Object> values)
-        {
+        public Criteria orValueNotIn(String key, List<Object> values) {
             key = getKey(key);
             addOrCriterion(key + " not in", values, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueBetween(String key, Object value1, Object value2)
-        {
+        public Criteria orValueBetween(String key, Object value1, Object value2) {
             key = getKey(key);
             addOrCriterion(key + " between", value1, value2, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
 
-        public Criteria orValueNotBetween(String key, Object value1, Object value2)
-        {
+        public Criteria orValueNotBetween(String key, Object value1, Object value2) {
             key = getKey(key);
             addOrCriterion(key + " not between", value1, value2, key);
-            return (Criteria)this;
+            return (Criteria) this;
         }
     }
 }
