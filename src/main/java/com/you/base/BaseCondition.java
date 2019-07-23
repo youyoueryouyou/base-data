@@ -206,6 +206,7 @@ public class BaseCondition {
                 columnMap.setColumnName(name);
                 columnMap.setColumnValue(model.getColumnValue(name));
                 columns.add(columnMap);
+                this.unionTable = false;
                 if (columnMap.getColumnValue() != null) {
                     getCriteria().andValueEqualTo(name, columnMap.getColumnValue());
                 }
